@@ -3,7 +3,6 @@ create table log_date (
     entry_date date not null
 );
 
-
 create table food (
     id integer primary key autoincrement,
     name text not null,
@@ -18,4 +17,4 @@ create table food_date (
     food_id integer not null,
     log_date_id integer not null,
     primary key(food_id, log_date_id)
-);
+);7657421r
