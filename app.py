@@ -28,6 +28,7 @@ def close_db(error):
 
 
 ## ROUTES
+#- INDEX
 @app.route('/', methods=['GET', 'POST'])
 def index():
     db = get_db()
@@ -44,23 +45,36 @@ def index():
         db.commit()
 
     #! Get the dates to display
-    cur = db.execute('select entry_date from log_date')
+    cur = db.execute('select entry_date from log_date order by entry_date desc')
     results = cur.fetchall()
 
     pretty_results = []
 
-    for in in results:
+    for i in results:
         single_date = {}
-        d = datetime.strptime(i['entry_date'], '%Y%m%d')
+        d = datetime.strptime(str(i['entry_date']), '%Y%m%d')
+        single_date['entry_date'] = datetime.strftime(d, '%B %d, %Y')
 
-    return render_template('home.html')
+        pretty_results.append(single_date)
 
-
-@app.route('/view')
-def view():
-    return render_template('day.html')
+    return render_template('home.html', results=pretty_results)
 
 
+#- VIEW
+@app.route('/view/<date>')
+def view(date):
+    db = get_db()
+
+    cur = db.execute('select entry_date from log_date where entry_date = ?', [date])
+    result = cur.fetchone()
+
+    d = datetime.strptime(str(result['entry_date']), '%Y%m%d')
+    pretty_date = datetime.strftime(d, '%B %d, %Y')
+
+    return render_template('day.html', date=pretty_date)
+
+
+#- FOOD
 @app.route('/food', methods=['GET', 'POST'])
 def food():
     db = get_db()
